@@ -12,7 +12,7 @@ var multer = require('multer');
 var flash = require('connect-flash');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-var db = mongoose.connection;
+// var db = mongoose.connection;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -33,6 +33,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+//connect to mondodb
+mongoose.connect('mongodb://localhost:27017/nodeauth');
+mongoose.connection.once('open', function(){
+  console.log('Listening on port 3000...');
+  app.listen(3000);
+});
+
+
 //handle express sessions
 app.use(session({
   secret: 'secret',
@@ -50,7 +58,7 @@ app.use(expressValidator({
       var namespace = param.split('.')
       , root    = namespace.shift()
       , formParam = root;
- 
+
     while(namespace.length) {
       formParam += '[' + namespace.shift() + ']';
     }
