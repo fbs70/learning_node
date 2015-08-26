@@ -12,7 +12,6 @@ var multer = require('multer');
 var flash = require('connect-flash');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-// var db = mongoose.connection;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -23,34 +22,18 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// handle file uploads
-// app.use(multer({dest: './uploads'}));
-app.use(multer({dest:'./uploads/'}).single('profileimage'));
+//handle file upload
+app.use(
+  multer({
+    dest:'./public/images/uploads/'
+  }).single('profileimage');
+);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-//connect to mondodb
-mongoose.connect('mongodb://localhost:27017/nodeauth');
-mongoose.connection.once('open', function(){
-  console.log('Listening on port 3000...');
-  app.listen(3000);
-});
-
-
-//handle express sessions
-app.use(session({
-  secret: 'secret',
-  saveUninitialized: true,
-  resave: true
-}));
-
-//Passport
-app.use(passport.initialize());
-app.use(passport.session());
 
 //validator
 app.use(expressValidator({
@@ -70,17 +53,29 @@ app.use(expressValidator({
   }
 }));
 
+//handle express sessions
+app.use(session({
+  secret: 'secret',
+  saveUninitialized: true,
+  resave: true
+}));
 
+//Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+//connect to mondodb
+mongoose.connect('mongodb://localhost:27017/nodeauth');
+mongoose.connection.once('open', function(){
+  console.log('Listening on port 27017...');
+  app.listen(27017);
+});
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//connect flash
+//app.use(flash);
 app.use(flash());
-app.use(function (req, res, next) {
-  res.locals.messages = require('express-messages')(req, res);
-  next();
-});
 
 app.use('/', routes);
 app.use('/users', users);

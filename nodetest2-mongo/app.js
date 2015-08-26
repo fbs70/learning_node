@@ -3,16 +3,9 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var passport = require('passport');
-var localStrategy = require('passport-local').Strategy;
 var bodyParser = require('body-parser');
-var expressValidator = require('express-validator');
-var multer = require('multer');
-var flash = require('connect-flash');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-// var db = mongoose.connection;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -23,63 +16,33 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// handle file uploads
-// app.use(multer({dest: './uploads'}));
-app.use(multer({dest:'./uploads/'}).single('profileimage'));
-
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-//connect to mondodb
-mongoose.connect('mongodb://localhost:27017/nodeauth');
-mongoose.connection.once('open', function(){
-  console.log('Listening on port 3000...');
-  app.listen(3000);
-});
-
-
-//handle express sessions
-app.use(session({
-  secret: 'secret',
-  saveUninitialized: true,
-  resave: true
-}));
-
-//Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
-//validator
-app.use(expressValidator({
-  errorFormatter: function(param, msg, value) {
-      var namespace = param.split('.')
-      , root    = namespace.shift()
-      , formParam = root;
-
-    while(namespace.length) {
-      formParam += '[' + namespace.shift() + ']';
-    }
-    return {
-      param : formParam,
-      msg   : msg,
-      value : value
-    };
-  }
-}));
-
-
-
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//connect flash
-app.use(flash());
-app.use(function (req, res, next) {
-  res.locals.messages = require('express-messages')(req, res);
-  next();
+//connect to mongodb
+mongoose.connect('mongodb://localhost:27017/nodetest2');
+var db = mongoose.connection;
+
+// for development only
+db.on('open', function(){
+    console.log('Mongoose default connection open');
+}).on('error', function(err){
+    console.log('Mongoose default connection error');
+}).on('disconnected', function(){
+    console.log('Mongoose default connection disconneted');
+});
+
+//if the node process ends, close the mongoose connection
+process.on('SIGINT', function() {
+   mongoose.connection.close(function () {
+       console.log('Mongoose default connection disconnected through app termination');
+       process.exit(0);
+   });
 });
 
 app.use('/', routes);

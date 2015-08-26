@@ -4,7 +4,7 @@ block content
 	h1 Register
 	p Please Register using the form below
 
-	form(method='post', action='/users/register')
+	form(method='post', action='/users/register', enctype='multipart/form-data')
 		.form-group
 			label Name
 			input.form-control(type='text', name='name', placeholder='Enter Name')
@@ -20,5 +20,8 @@ block content
 		.form-group
 			label Confirm Password
 			input.form-control(type='password', name='password2', placeholder='Confirm Password')
-
+		.form-group
+			label Profile Image
+			input(type='file', name='profileimage')
 		input.btn.btn-primary(type='submit', name='submit', value="Register")
+
