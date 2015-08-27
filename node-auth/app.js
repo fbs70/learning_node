@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
-var localStrategy = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 var multer = require('multer');
@@ -25,32 +25,28 @@ app.set('view engine', 'jade');
 
 // handle file uploads
 // app.use(multer({dest: './uploads'}));
-app.use(multer({dest:'./uploads/'}).single('profileimage'));
+app.use(multer({dest:'./public/images/uploads/'}).single('profileimage'));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-//connect to mondodb
-mongoose.connect('mongodb://localhost:27017/nodeauth');
-mongoose.connection.once('open', function(){
-  console.log('Listening on port 3000...');
-  app.listen(3000);
-});
-
+app.use(cookieParser());
 
 //handle express sessions
-app.use(session({
-  secret: 'secret',
-  saveUninitialized: true,
-  resave: true
+app.use(require('express-session')({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
 }));
-
 //Passport
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')));
+
+//connect to mondodb
+mongoose.connect('mongodb://localhost/nodeauth');
 
 //validator
 app.use(expressValidator({
@@ -70,10 +66,6 @@ app.use(expressValidator({
   }
 }));
 
-
-
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 //connect flash
 app.use(flash());
