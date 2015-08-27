@@ -1,5 +1,6 @@
 var express = require('express');
 var multer = require('multer');
+var User = require('../models/db');
 var router = express.Router();
 
 /* GET users listing. */
@@ -58,12 +59,16 @@ router.post('/register', function(req, res, next) {
       if(err) throw err;
       console.log(user);
     });*/
+    newUser.save(function(err, newuser){
+        if(err) return console.log(err);
+       //res.send((err === null) ? { msg: '' } : { msg: err });
+    });
 
     //success message
-    /* req.flash('success', 'You are now registered. You may login');
+    req.flash('success', 'You are now registered. You may login');
 
     res.location('/');
-    res.redirect('/'); */
+    res.redirect('/'); 
   }
 });
 
