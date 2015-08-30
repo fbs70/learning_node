@@ -2,12 +2,12 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var expressValidator = require('express-validator');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bodyParser = require('body-parser');
-var expressValidator = require('express-validator');
 var multer = require('multer');
 var flash = require('connect-flash');
 var mongo = require('mongodb');
@@ -25,7 +25,7 @@ app.set('view engine', 'jade');
 
 // handle file uploads
 // app.use(multer({dest: './uploads'}));
-app.use(multer({dest:'./public/images/uploads/'}) //.single('profileimage'));
+app.use(multer({dest:'./public/images/uploads/'}).single('profileimage'));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -73,7 +73,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get('*',fuction(req, res, next){
+app.get('*', function(req, res, next) {
   res.locals.user = req.user || null;
   next();
 });

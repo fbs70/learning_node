@@ -4,16 +4,25 @@ block content
 	h1 Register
 	p Please Register using the form below
 
+	if errors
+		div.alert.alert-danger
+			ul.errors
+				each error, i in errors
+					li #{error.msg}
+
 	form(method='post', action='/users/register')
 		.form-group
 			label Name
-			input.form-control(type='text', name='name', placeholder='Enter Name')
+			if name
+				input.form-control(type='text', name='name', value= name)
+			else
+				input.form-control(type='text', name='name', placeholder='Enter Name')
 		.form-group
 			label Email
-			input.form-control(type='email', name='email', placeholder='Enter Email')
+			input.form-control(type='email', name='email', value= email, placeholder='Enter Email')
 		.form-group
 			label Username
-			input.form-control(type='text', name='username', placeholder='Username')
+			input.form-control(type='text', name='username', value= username, placeholder='Username')
 		.form-group
 			label Password
 			input.form-control(type='password', name='password', placeholder='Password')

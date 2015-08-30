@@ -1,4 +1,5 @@
 var express = require('express');
+var passport = require('passport');
 var multer = require('multer');
 var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/db');
@@ -23,7 +24,7 @@ router.post('/register', function(req, res, next) {
   var username = req.body.username;
   var email = req.body.email;
   var password = req.body.password;
-  var password2 = req.body.password1;
+  var password2 = req.body.password2;
 
   var profileImageName = 'noimage.png';
 
@@ -33,7 +34,7 @@ router.post('/register', function(req, res, next) {
   req.checkBody('email','Email not valid.').isEmail();
   req.checkBody('username', 'Username is required.').notEmpty();
   req.checkBody('password','Password is required.').notEmpty();
-  req.checkBody('password2','Passwords do not match').equals(req.body.pasword);
+  req.checkBody('password2','Passwords do not match').equals(req.body.password);
 
   // chk for errors
   var errors = req.validationErrors();
@@ -63,7 +64,7 @@ router.post('/register', function(req, res, next) {
         passport.authenticate('local')(req, res, function(){
           req.flash('success', 'You are registered');
         });
-      };)
+      });
   }
 });
 
