@@ -12,7 +12,7 @@ var multer = require('multer');
 var flash = require('connect-flash');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-// var db = mongoose.connection;
+var db = mongoose.connection;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -25,14 +25,13 @@ app.set('view engine', 'jade');
 
 // handle file uploads
 // app.use(multer({dest: './uploads'}));
-app.use(multer({dest:'./public/images/uploads/'}).single('profileimage'));
+app.use(multer({dest:'./public/images/uploads/'}) //.single('profileimage'));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 //handle express sessions
 app.use(require('express-session')({
@@ -40,13 +39,6 @@ app.use(require('express-session')({
     resave: false,
     saveUninitialized: false
 }));
-//Passport
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
-
-//connect to mondodb
-mongoose.connect('mongodb://localhost/nodeauth');
 
 //validator
 app.use(expressValidator({
@@ -67,6 +59,13 @@ app.use(expressValidator({
 }));
 
 
+app.use(cookieParser());
+
+//Passport
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')));
+
 //connect flash
 app.use(flash());
 app.use(function (req, res, next) {
@@ -74,8 +73,22 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.get('*',fuction(req, res, next){
+  res.locals.user = req.user || null;
+  next();
+});
+
 app.use('/', routes);
 app.use('/users', users);
+
+// connect to passport
+var User = require('./models/db');
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//connect to mondodb
+mongoose.connect('mongodb://localhost/nodeauth');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
